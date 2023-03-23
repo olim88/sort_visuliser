@@ -41,6 +41,8 @@ impl MainController{
                 Key::D1 => self.update_current_sort_type(AlgorithmTypes::Bogo, algorithm),
                 Key::D2 => self.update_current_sort_type(AlgorithmTypes::Merge, algorithm),
                 Key::D3 => self.update_current_sort_type(AlgorithmTypes::Bubble, algorithm),
+                Key::D4 => self.update_current_sort_type(AlgorithmTypes::InsertionSort, algorithm),
+                Key::D5 => self.update_current_sort_type(AlgorithmTypes::HeapSort, algorithm),
                 _ => {}
             }
         }
@@ -95,6 +97,8 @@ impl MainController{
                 AlgorithmTypes::Bogo => (self.display_values,self.updated_values) = algorithm.bogo.do_sort().clone(),
                 AlgorithmTypes::Merge => (self.display_values,self.updated_values) = algorithm.merge.do_sort().clone(),
                 AlgorithmTypes::Bubble => (self.display_values,self.updated_values) = algorithm.bubble.do_sort().clone(),
+                AlgorithmTypes::InsertionSort => (self.display_values,self.updated_values) = algorithm.insertion.do_sort().clone(),
+                AlgorithmTypes::HeapSort => (self.display_values,self.updated_values) = algorithm.heap.do_sort().clone(),
             };
             if check_sorted(&self.display_values){
                 self.sorted = true;
@@ -112,6 +116,8 @@ impl MainController{
                 AlgorithmTypes::Bogo => (self.display_values,self.updated_values) = algorithm.bogo.do_step().clone(),
                 AlgorithmTypes::Merge => (self.display_values,self.updated_values) = algorithm.merge.do_step().clone(),
                 AlgorithmTypes::Bubble => (self.display_values,self.updated_values) = algorithm.bubble.do_step().clone(),
+                AlgorithmTypes::InsertionSort => (self.display_values,self.updated_values) = algorithm.insertion.do_step().clone(),
+                AlgorithmTypes::HeapSort => (self.display_values,self.updated_values) = algorithm.heap.do_step().clone(),
             };
             if check_sorted(&self.display_values){
                 self.sorted = true;
