@@ -13,6 +13,8 @@ mod renderer;
 mod algorithms;
 mod main_cotroller;
 
+static FONT: &str = "assets/fonts/Roboto-Regular.ttf";
+
 fn main() {
     //create the window
     let opengl = OpenGL::V3_2;
@@ -37,12 +39,16 @@ fn main() {
     //create sorting algorithm
     let mut sort_algorithms = Algorithms::new(starting_values.clone());
 
+    //text 
+    let texture_settings = TextureSettings::new().filter(Filter::Nearest);
+    let ref mut glyphs = GlyphCache::new(FONT, (), texture_settings)
+        .expect(&format!("failed to load font `{}`", FONT));
 
     //main loop
     while let Some(e) = events.next(&mut window) {
         contoller.event(&e,  &mut sort_algorithms);
         //update render
-        render.update_values(&contoller.display_values,&contoller.updated_values, &contoller.sorted);
+        render.update_values(&contoller.display_values,&contoller.updated_values, &contoller.sorted, contoller.hud_values.clone());
         //render events
         if let Some(args) = e.render_args() {
             //resize the chart if resized
@@ -56,7 +62,7 @@ fn main() {
                 //clear background 
                 clear([0.3; 4], g);
                 //draw values
-                render.draw::<GlGraphics, piston::Key>( &c, g);
+                render.draw( glyphs,&c, g);
             });
         }
         

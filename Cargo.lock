@@ -1410,6 +1410,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "rust_math"
+version = "0.3.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5f8cb0c9ad55746a4f9630e638c7809cd7eef2e754024d01b9ea5f51743134ff"
+
+[[package]]
 name = "rusttype"
 version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1531,6 +1537,7 @@ dependencies = [
  "piston2d-opengl_graphics",
  "pistoncore-glutin_window",
  "rand",
+ "rust_math",
 ]
 
 [[package]]
