@@ -113,7 +113,7 @@ impl MainController{
 
         //if the data is not sorted continue sort
         if !check_sorted(&self.display_values){
-            let mut n_change= 0;
+            let n_change;
             self.sorted = false;
             match algorithm.current_type {
                 AlgorithmTypes::Bogo => (self.display_values,self.updated_values,n_change) = algorithm.bogo.do_sort().clone(),

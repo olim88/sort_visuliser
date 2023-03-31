@@ -228,11 +228,9 @@ impl BubbleSort {
     pub fn do_step(&mut self) -> (Vec<i32>,Vec<usize>,usize){ //returns values and the indexs updated
         let first_index = self.index;
         let second_index = self.index + 1;
-        let mut n_count = 0;
         //if need swap swap values
         if self.values[first_index] > self.values[second_index]{
             (self.values[first_index], self.values[second_index]) = (self.values[second_index], self.values[first_index]);
-            n_count  = 2;
 
         }
         //increase the index
@@ -242,7 +240,7 @@ impl BubbleSort {
             self.index = 0;
         }
 
-        (self.values.clone(),vec![first_index,second_index],2)
+        (self.values.clone(),vec![first_index,second_index],1)
     }
 }
 
@@ -297,6 +295,7 @@ pub struct HeapSort{
     pub complexity: String,
  
 }
+//heap sort
 impl HeapSort{
     pub fn new(start_values: &Vec<i32>)->HeapSort{
         HeapSort { values: start_values.to_vec(), index:start_values.len()/2,second_half :false,need_heapify:false,heapify_max_range:0,heapify_parent_node:0, name: "Heap sort".to_string(),complexity:"best: O(nlogn), average: O(nlogn), worst: O(nlogn)".to_string() }
@@ -320,8 +319,7 @@ impl HeapSort{
         while self.need_heapify {     
             let mut out = self.do_step();        
             updated.append(&mut out.1);  
-            n_count += out.2;
-                      
+            n_count += out.2;                      
         }
 
         (self.values.clone(),updated.clone(),n_count)
@@ -347,7 +345,7 @@ impl HeapSort{
                 let updated = vec![self.heapify_parent_node,largest];
                 self.heapify_parent_node = largest;
                 self.need_heapify = true;
-                return (self.values.clone(),updated,2);
+                return (self.values.clone(),updated,1);
             }            
         }
         else{
@@ -364,7 +362,7 @@ impl HeapSort{
                 //swap the first value with the value in at the index
                 self.values.swap(0,self.index);
                 updated = vec![0,self.index];
-                n_count += 2;
+                n_count += 1;
                 //get ready to heapify again
                 self.heapify_max_range = self.index;
                 self.heapify_parent_node = 0;
