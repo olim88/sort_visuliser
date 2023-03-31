@@ -25,9 +25,20 @@ impl ControllerSettings{
     }
 }
 
+pub struct AutoUpdateValues{
+    pub on: bool,
+    pub time: u64,
+    pub step : bool,
+}
+impl AutoUpdateValues{
+    pub fn new() -> AutoUpdateValues{
+        AutoUpdateValues{on: false, time: 5, step: true}
+    }
+}
 
 pub struct MainController{
     pub settings: ControllerSettings,
+    pub  update_on_loop_values: AutoUpdateValues,
     pub hud_values: HudValues,
     pub display_values: Vec<i32>,
     pub updated_values: Vec<usize>,
@@ -38,11 +49,22 @@ impl MainController{
     pub fn new(start_values: &Vec<i32>) -> MainController {
         MainController {
             settings: ControllerSettings::new(),
+            update_on_loop_values: AutoUpdateValues::new(),
             hud_values: HudValues::new(),
             display_values: start_values.to_vec(),
             updated_values: Vec::new(),
             sorted: false,
             max_value: 100,
+        }
+    }
+    pub fn time_update(&mut self,algorithm: &mut Algorithms){
+        if self.update_on_loop_values.on{
+            if self.update_on_loop_values.step{
+                self.do_current_step(algorithm);
+            
+            }else{
+                self.do_current_sort(algorithm);
+            }
         }
     }
     pub fn event<E: GenericEvent>(&mut self, e: &E,algorithm: &mut Algorithms){
@@ -66,6 +88,11 @@ impl MainController{
                 Key::Space => self.do_current_sort(algorithm),
                 Key::Tab => self.do_current_step(algorithm),
                 Key::R => self.re_shuffle_values(algorithm),
+                //loop values
+                Key::L => self.update_on_loop_values.on = !self.update_on_loop_values.on,
+                Key::J => self.update_on_loop_values.time = self.update_on_loop_values.time - 1,
+                Key::K => self.update_on_loop_values.time = self.update_on_loop_values.time + 1,
+                Key::H => self.update_on_loop_values.step = !self.update_on_loop_values.step,
                 _ => {}
             }
         }

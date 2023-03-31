@@ -3,7 +3,7 @@ use opengl_graphics::{
     Filter, GlGraphics, GlyphCache, OpenGL, TextureSettings,
 };
 use piston::event_loop::{EventSettings, Events};
-use piston::{EventLoop, RenderEvent, WindowSettings};
+use piston::{EventLoop,UpdateEvent, RenderEvent, WindowSettings, controller};
 
 use crate::renderer::{Renderer,RenderSettings};
 use crate::algorithms::{Algorithms};
@@ -24,7 +24,7 @@ fn main() {
         .vsync(true);
     let mut window: GlutinWindow =
         settings.build().expect("Could not create window");
-    let mut events = Events::new(EventSettings::new().lazy(true));
+    let mut events = Events::new(EventSettings::new().ups(2));
     let mut gl = GlGraphics::new(opengl);
 
     //create value to store old window size
@@ -46,10 +46,18 @@ fn main() {
 
     //main loop
     while let Some(e) = events.next(&mut window) {
+        if let Some(_args) = e.update_args() {
+            //update time based update for controller
+            contoller.time_update(&mut sort_algorithms);
+            events.set_ups(contoller.update_on_loop_values.time);
+        }
+
+        //update controller for inputs
         contoller.event(&e,  &mut sort_algorithms);
         //update render
         render.update_values(&contoller.display_values,&contoller.updated_values, &contoller.sorted, contoller.hud_values.clone());
-        //render events
+
+               //render events
         if let Some(args) = e.render_args() {
             //resize the chart if resized
             if args.window_size != old_window_size{
