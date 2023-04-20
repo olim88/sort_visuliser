@@ -24,7 +24,7 @@ fn main() {
         .vsync(true);
     let mut window: GlutinWindow =
         settings.build().expect("Could not create window");
-    let mut events = Events::new(EventSettings::new().ups(2));
+    let mut events = Events::new(EventSettings::new().ups(100));
     let mut gl = GlGraphics::new(opengl);
 
     //create value to store old window size
@@ -43,13 +43,13 @@ fn main() {
     let texture_settings = TextureSettings::new().filter(Filter::Nearest);
     let ref mut glyphs = GlyphCache::new(FONT, (), texture_settings)
         .expect(&format!("failed to load font `{}`", FONT));
-
+    //initilise the controller
+    contoller.init(algorithms::AlgorithmTypes::Merge, &mut sort_algorithms);
     //main loop
     while let Some(e) = events.next(&mut window) {
         if let Some(_args) = e.update_args() {
-            //update time based update for controller
+            //update controller
             contoller.time_update(&mut sort_algorithms);
-            events.set_ups(contoller.update_on_loop_values.time);
         }
 
         //update controller for inputs

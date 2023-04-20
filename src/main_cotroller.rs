@@ -8,11 +8,14 @@ pub struct HudValues{
     pub algorithm_info: AlgorithmInfo,
     pub predicted_n: String,
     pub current_n: usize,
-    pub total_n: usize
+    pub total_n: usize,
+    pub auto_sort: bool,
+    pub auto_sort_step: bool,
+    pub auto_sort_speed: usize,
 }
 impl HudValues {
     pub fn new() -> HudValues{
-        HudValues { algorithm_info: AlgorithmInfo { name: "".to_string(), complexity: "".to_string() },predicted_n: "".to_string(), current_n: 0,total_n: 0 }
+        HudValues { algorithm_info: AlgorithmInfo { name: "".to_string(), complexity: "".to_string() },predicted_n: "".to_string(), current_n: 0,total_n: 0,auto_sort: false,auto_sort_step:true,auto_sort_speed:5 }
     }
 }
 
@@ -27,12 +30,15 @@ impl ControllerSettings{
 
 pub struct AutoUpdateValues{
     pub on: bool,
-    pub time: u64,
-    pub step : bool,
+    pub base_time: u64, //times per seconds
+    pub update_couter: i32, //how many updates there has been since the last change
+    pub step : bool, //if the auto update is doing steps or sort pass
+    pub options: [i32;10], //options for the multiplier of the times per second
+    pub current_option_index: usize //the index of the current time multiplyer
 }
 impl AutoUpdateValues{
     pub fn new() -> AutoUpdateValues{
-        AutoUpdateValues{on: false, time: 5, step: true}
+        AutoUpdateValues{on: false, base_time: 100,update_couter:0, step: true,options:[1,2,25,50,100,150,200,300,500,1000],current_option_index: 5}
     }
 }
 
@@ -57,14 +63,26 @@ impl MainController{
             max_value: 100,
         }
     }
+    pub fn init(&mut self,starting_algortithm: AlgorithmTypes,algorithm: &mut Algorithms){
+        self.update_current_sort_type(starting_algortithm, algorithm);
+    }
     pub fn time_update(&mut self,algorithm: &mut Algorithms){
+        //if enabled
         if self.update_on_loop_values.on{
-            if self.update_on_loop_values.step{
-                self.do_current_step(algorithm);
-            
-            }else{
-                self.do_current_sort(algorithm);
+            //update couter
+            self.update_on_loop_values.update_couter += 1;
+            //if the count is big enough do a sort and reset it
+            if self.update_on_loop_values.update_couter >= self.update_on_loop_values.options[self.update_on_loop_values.current_option_index]{
+                self.update_on_loop_values.update_couter = 0;
+                //update
+                if self.update_on_loop_values.step{
+                    self.do_current_step(algorithm);
+                
+                }else{
+                    self.do_current_sort(algorithm);
+                }
             }
+            
         }
     }
     pub fn event<E: GenericEvent>(&mut self, e: &E,algorithm: &mut Algorithms){
@@ -90,11 +108,12 @@ impl MainController{
                 Key::R => self.re_shuffle_values(algorithm),
                 //loop values
                 Key::L => self.update_on_loop_values.on = !self.update_on_loop_values.on,
-                Key::J => self.update_on_loop_values.time = self.update_on_loop_values.time - 1,
-                Key::K => self.update_on_loop_values.time = self.update_on_loop_values.time + 1,
+                Key::K => self.update_on_loop_values.current_option_index = if self.update_on_loop_values.current_option_index>0{self.update_on_loop_values.current_option_index -1}else{self.update_on_loop_values.current_option_index},
+                Key::J => self.update_on_loop_values.current_option_index = if self.update_on_loop_values.current_option_index<(self.update_on_loop_values.options.len()-1){self.update_on_loop_values.current_option_index +1}else{self.update_on_loop_values.current_option_index},
                 Key::H => self.update_on_loop_values.step = !self.update_on_loop_values.step,
                 _ => {}
             }
+            self.update_hud_auto_info();
         }
         //scroll number of values
         if let Some(args) = e.mouse_scroll_args(){
@@ -127,7 +146,7 @@ impl MainController{
             }
         }
     }
-    fn update_current_sort_type(&mut self,new_type: AlgorithmTypes, algorithm: &mut Algorithms){
+    fn update_current_sort_type(&mut self,new_type: AlgorithmTypes, algorithm: &mut Algorithms){        
         //makesure the have the same values
         algorithm.reset_values(&self.display_values);
         //set the new type
@@ -180,6 +199,12 @@ impl MainController{
    
             
     }
+    fn update_hud_auto_info(&mut self){
+        //update auto state
+        self.hud_values.auto_sort = self.update_on_loop_values.on;
+        self.hud_values.auto_sort_step = self.update_on_loop_values.step;
+        self.hud_values.auto_sort_speed = 10-(self.update_on_loop_values.current_option_index );
+    }
     fn update_hud_info(&mut self, algorithm: &mut Algorithms){
         //get the text for the current sort
         match algorithm.current_type {
@@ -190,7 +215,7 @@ impl MainController{
             AlgorithmTypes::HeapSort => (self.hud_values.algorithm_info.name,self.hud_values.algorithm_info.complexity) = (algorithm.heap.name.clone(),algorithm.heap.complexity.clone()),
         };
         //update the prediction values
-        self.updated_hud_predicted(algorithm);
+        self.updated_hud_predicted(algorithm);  
 
     }
     fn updated_hud_predicted(&mut self, algorithm: &mut Algorithms){

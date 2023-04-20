@@ -82,7 +82,7 @@ impl Renderer{
         }
 
         //draw text about algorithms#
-        self.render_lines_text(format!("Current algorithm: {} \nComplexity: {} \nPredicted count: {} \nCurrent iterator: {} \n Total values: {}",self.hud_values.algorithm_info.name,self.hud_values.algorithm_info.complexity,self.hud_values.predicted_n,self.hud_values.current_n,self.hud_values.total_n), glyphs, c, g);
+        self.render_lines_text(format!("Current algorithm: {} \nComplexity: {} \nPredicted count: {} \nCurrent iterator: {} \n Total values: {} \nAuto: {}, Step: {}, Speed: {}",self.hud_values.algorithm_info.name,self.hud_values.algorithm_info.complexity,self.hud_values.predicted_n,self.hud_values.current_n,self.hud_values.total_n,self.hud_values.auto_sort,self.hud_values.auto_sort_step,self.hud_values.auto_sort_speed), glyphs, c, g);
         
         
     }
